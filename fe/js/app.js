@@ -3,7 +3,7 @@ var todo_count;
 
 (function (window) {
 	'use strict';
-	//All GET
+	// All GET
 	$('#allId').trigger('click');
 	// Your starting point. Enjoy the ride!
 })(window);
@@ -11,10 +11,10 @@ var todo_count;
 // COMPLETED CHECKBOX TOGGLE
 $('.todo-list').on('click', '.toggle', function() {
 	$(this).parents('li').toggleClass('completed');
-	parents_class = $(this).parents('li').attr('class');
+	parent_ls_class = $(this).parents('li').attr('class');
 	//todo_count = parseInt($('.todo-count strong').text());
-	console.log(parents_class);
-	if(parents_class == 'completed') {
+	console.log(parent_ls_class);
+	if(parent_ls_class == 'completed') {
 		ChangeTodoStatus($(this).attr('value'), false);
 		--todo_count;
 	}
@@ -23,6 +23,51 @@ $('.todo-list').on('click', '.toggle', function() {
 		++todo_count
 	}
 	$('.todo-count strong').text( todo_count );
+});
+
+// CLEAR COMPLETED
+$('.clear-completed').click(function() {
+	$('.todo-list li').each(function( index ) {
+		if( $(this).attr('class') == 'completed') {
+			var id = $(this).children('.view').children('.toggle').attr('value');
+			var element = this;
+			
+			$.ajax({
+				url: myurl + "/" + id,
+				type: "DELETE",
+				success: function( response ) {
+					console.log("delete success!");
+					$(element).remove();					
+				},
+				error: function(jqXHR, exception) {
+					alert(jqXHR.status + ' ' + jqXHR.responseText);
+				}	
+			})
+		}	
+	});
+});
+
+// DELETE
+$('.todo-list').on('click', '.destroy', function() {
+	
+	var id = $(this).siblings('.toggle').attr('value');
+	var parent_ls_class = $(this).parents('li').attr('class');
+	var element = this;
+	
+	$.ajax({
+		url: myurl + "/" + id,
+		type: "DELETE",
+		success: function( response ) {
+			console.log("delete success!");
+			$(element).parents('li').remove();
+			if(parent_ls_class != 'completed') {
+				$('.todo-count strong').text( --todo_count );	
+			}
+		},
+		error: function(jqXHR, exception) {
+			alert(jqXHR.status + ' ' + jqXHR.responseText);
+		}	
+	})
 });
 
 function ChangeTodoStatus (id, status) {
@@ -46,7 +91,7 @@ function ChangeTodoStatus (id, status) {
 	});		
 }
 
-//POST
+//CREATE
 $(".new-todo").keypress(function (event) {
 	if( event.which == 13 ) {
 		event.preventDefault();
@@ -102,12 +147,13 @@ function CreateTodo () {
 	});		
 }
 
-// FILTER 
+// FILTER SELECTED EFFECT
 $('.filters li a').click( function() {
 	$('.filters li a').removeClass('selected');
 	$(this).addClass('selected');
 });	
 
+// ALL GET
 function AllGet (e) {	
 		e.preventDefault();
 			
@@ -154,7 +200,7 @@ function AllGet (e) {
 		return false;
 }
 
-
+// ACTIVE GET
 function ActiveGet (e) {
 	e.preventDefault();
 			
@@ -193,6 +239,7 @@ function ActiveGet (e) {
 	return false;
 }
 
+// COMPLETED GET
 function CompletedGet (e) {
 	e.preventDefault();
 	
