@@ -1,12 +1,57 @@
 var myurl = "http://localhost:8080/api/todos";
+var todo_count;
 
+(function (window) {
+	'use strict';
+	//All GET
+	$('#allId').trigger('click');
+	// Your starting point. Enjoy the ride!
+})(window);
+
+// COMPLETED CHECKBOX TOGGLE
+$('.todo-list').on('click', '.toggle', function() {
+	$(this).parents('li').toggleClass('completed');
+	parents_class = $(this).parents('li').attr('class');
+	//todo_count = parseInt($('.todo-count strong').text());
+	console.log(parents_class);
+	if(parents_class == 'completed') {
+		ChangeTodoStatus($(this).attr('value'), false);
+		$('.todo-count strong').text( --todo_count );
+	}
+	else {
+		ChangeTodoStatus($(this).attr('value'), true);
+		$('.todo-count strong').text( ++todo_count );
+	}
+});
+
+function ChangeTodoStatus (id, status) {
+	
+	var data = { 
+			"status": status,
+	};
+	
+	$.ajax({
+		url: myurl + "/" + id,
+		type: "PUT",
+		contentType : 'application/json',
+		data: JSON.stringify(data),
+		// jsonp: "callback",
+		success: function( response ) {
+			console.log("update success!");
+		},
+		error: function(jqXHR, exception) {
+			alert(jqXHR.status + ' ' + jqXHR.responseText);
+		}	
+	});		
+}
+
+//POST
 $(".new-todo").keypress(function (event) {
 	if( event.which == 13 ) {
 		event.preventDefault();
-		// post
 		CreateTodo();
 	}		
-	//alert("다른 키가 눌렸니?");
+	console.log("다른 키가 눌렸니?");
 });
 
 function CreateTodo () {
@@ -27,9 +72,10 @@ function CreateTodo () {
 	
 	var data = { 
 			"todo": $('.new-todo').val(),
+			"status": true,
 			"date": today
 	};
-	
+
 	$.ajax({
 		url: myurl,
 		type: "POST",
@@ -39,24 +85,23 @@ function CreateTodo () {
 		success: function( response ) {
 			var todo = response;
 								
-				$('.todo-list').append("<li><div class=\"view\">" +
-						"<input class=\"toggle\" type=\"checkbox\">" +
+				$('.todo-list').prepend("<li><div class=\"view\">" +
+						"<input class=\"toggle\" type=\"checkbox\" value=\""+ todo.id +"\">" +
 						"<label>" + todo.todo + "</label>" +
 						"<button class=\"destroy\"></button>" +
 						"</div>" +
 						"<input class=\"edit\" value=\"Rule the web\">" +
-						"</li>");			 						
+						"</li>");
+				
+				$('.todo-count strong').text( ++todo_count );
 		},
 		error: function(jqXHR, exception) {
 			alert(jqXHR.status + ' ' + jqXHR.responseText);
 		}	
 	});		
-	
-	return false;
 }
 
-function AllGet (e) {
-	
+function AllGet (e) {	
 		e.preventDefault();
 				 				
 		$.ajax({
@@ -67,17 +112,30 @@ function AllGet (e) {
 			success: function( response ) {
 				var todoList = response;
 				
+				todo_count = todoList.length; // 초기화
+				if( isNaN(todo_count) )
+					todo_count = 0;
+				
 				for( var i = 0; i < todoList.length; i++) {
 					todo = todoList[i];
 					
-					$('.todo-list').append("<li><div class=\"view\">" +
-							"<input class=\"toggle\" type=\"checkbox\">" +
+					var statusText ="";
+					var checked ="";
+					if( !todo.status ) {
+						statusText = " class=\"completed\"";
+						checked =" checked";
+						todo_count--;
+					}
+					$('.todo-list').prepend("<li"+ statusText + "><div class=\"view\">" +
+							"<input class=\"toggle\" type=\"checkbox\" value=\""+ todo.id +"\""+ checked +">" +
 							"<label>" + todo.todo + "</label>" +
 							"<button class=\"destroy\"></button>" +
 							"</div>" +
 							"<input class=\"edit\" value=\"Rule the web\">" +
-							"</li>");
-				};				 						
+							"</li>");					
+				};
+								
+				$('.todo-count strong').text( todo_count );
 			},
 			error: function(jqXHR, exception) {
 				alert(jqXHR.status + ' ' + jqXHR.responseText);
@@ -87,11 +145,15 @@ function AllGet (e) {
 		return false;
 }
 
-(function (window) {
-	'use strict';
+/*
+function ActiveGet (e) {
+		e.preventDefault();
+		
+		$.ajax({
+			
+		});
 
-	$('#allId').trigger('click'); // 왜 웹문서 전체가?	
-	
-	// Your starting point. Enjoy the ride!
+		return false;
 
-})(window);
+}
+*/
