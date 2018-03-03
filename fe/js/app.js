@@ -1,10 +1,3 @@
-(function (window) {
-	'use strict';
-
-	// Your starting point. Enjoy the ride!
-
-})(window);
-
 $(".new_todo").keypress(function (event) {
 	if( event.which == 13 ) {
 		event.preventDefault();
@@ -47,3 +40,12 @@ function AllGet (e) {
 		
 		return false;
 }
+
+(function (window) {
+	'use strict';
+
+	$('#allId').trigger('click'); // 왜 웹문서 전체가?
+	
+	// Your starting point. Enjoy the ride!
+
+})(window);
