@@ -37,6 +37,13 @@ public class TodoController {
 		return searchedTodos;
 	}
 	
+	@GetMapping("/{status}")
+	Collection<Todo> readListbyStatus(@PathVariable Boolean status) {
+		Collection<Todo> searchedTodos = service.findByStatus(status);
+		log.info("searchedTodosbyStatus_{}: {} ", status, searchedTodos);
+		return searchedTodos;
+	}
+	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	Todo create(@RequestBody Todo todo) {

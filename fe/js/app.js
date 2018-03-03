@@ -16,12 +16,13 @@ $('.todo-list').on('click', '.toggle', function() {
 	console.log(parents_class);
 	if(parents_class == 'completed') {
 		ChangeTodoStatus($(this).attr('value'), false);
-		$('.todo-count strong').text( --todo_count );
+		--todo_count;
 	}
 	else {
 		ChangeTodoStatus($(this).attr('value'), true);
-		$('.todo-count strong').text( ++todo_count );
+		++todo_count
 	}
+	$('.todo-count strong').text( todo_count );
 });
 
 function ChangeTodoStatus (id, status) {
@@ -101,9 +102,15 @@ function CreateTodo () {
 	});		
 }
 
+// FILTER 
+$('.filters li a').click( function() {
+	$('.filters li a').removeClass('selected');
+	$(this).addClass('selected');
+});	
+
 function AllGet (e) {	
 		e.preventDefault();
-				 				
+			
 		$.ajax({
 			url: myurl,
 			type: "GET",
@@ -116,6 +123,7 @@ function AllGet (e) {
 				if( isNaN(todo_count) )
 					todo_count = 0;
 				
+				$('.todo-list').empty();
 				for( var i = 0; i < todoList.length; i++) {
 					todo = todoList[i];
 					
@@ -126,6 +134,7 @@ function AllGet (e) {
 						checked =" checked";
 						todo_count--;
 					}
+					
 					$('.todo-list').prepend("<li"+ statusText + "><div class=\"view\">" +
 							"<input class=\"toggle\" type=\"checkbox\" value=\""+ todo.id +"\""+ checked +">" +
 							"<label>" + todo.todo + "</label>" +
@@ -145,15 +154,73 @@ function AllGet (e) {
 		return false;
 }
 
-/*
+
 function ActiveGet (e) {
-		e.preventDefault();
-		
-		$.ajax({
+	e.preventDefault();
 			
-		});
+	$.ajax({
+		url: myurl + "/" + true,
+		type: "GET",
+		//contentType : 'application/json',
+		// jsonp: "callback",
+		success: function( response ) {
+			var todoList = response;
+			
+			todo_count = todoList.length; // 초기화
+			if( isNaN(todo_count) )
+				todo_count = 0;
+			
+			$('.todo-list').empty();
+			for( var i = 0; i < todoList.length; i++) {
+				todo = todoList[i];
+					
+				$('.todo-list').prepend("<li><div class=\"view\">" +
+						"<input class=\"toggle\" type=\"checkbox\" value=\""+ todo.id +"\">" +
+						"<label>" + todo.todo + "</label>" +
+						"<button class=\"destroy\"></button>" +
+						"</div>" +
+						"<input class=\"edit\" value=\"Rule the web\">" +
+						"</li>");					
+			};
+							
+			$('.todo-count strong').text( todo_count );
+		},
+		error: function(jqXHR, exception) {
+			alert(jqXHR.status + ' ' + jqXHR.responseText);
+		}	
+	});
 
-		return false;
-
+	return false;
 }
-*/
+
+function CompletedGet (e) {
+	e.preventDefault();
+	
+	$.ajax({
+		url: myurl + "/" + false,
+		type: "GET",
+		//contentType : 'application/json',
+		// jsonp: "callback",
+		success: function( response ) {
+			var todoList = response;
+					
+			$('.todo-list').empty();
+			for( var i = 0; i < todoList.length; i++) {
+				todo = todoList[i];
+					
+				$('.todo-list').prepend("<li class=\"completed\"><div class=\"view\">" +
+						"<input class=\"toggle\" type=\"checkbox\" value=\""+ todo.id +"\" checked>" +
+						"<label>" + todo.todo + "</label>" +
+						"<button class=\"destroy\"></button>" +
+						"</div>" +
+						"<input class=\"edit\" value=\"Rule the web\">" +
+						"</li>");					
+			};
+		},
+		error: function(jqXHR, exception) {
+			alert(jqXHR.status + ' ' + jqXHR.responseText);
+		}	
+	});
+
+	return false;
+}

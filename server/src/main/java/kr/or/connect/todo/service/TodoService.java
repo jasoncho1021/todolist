@@ -29,6 +29,15 @@ public class TodoService {
 		*/				
 	}
 	
+	public Collection<Todo> findByStatus(Boolean status) {
+		Collection<Todo> results = new ArrayList<>();
+		for ( Integer key : repo.keySet() ) {
+			if ( repo.get(key).getStatus() == status )
+				results.add(repo.get(key));
+		}
+		return results;
+	}
+	
 	public Todo create(Todo todo) {
 		Integer id = maxId.addAndGet(1);
 		todo.setId(id);
