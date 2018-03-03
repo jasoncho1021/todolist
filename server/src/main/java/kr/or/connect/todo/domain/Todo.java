@@ -9,9 +9,9 @@ public class Todo {
 	public Todo() {
 	}
 	
-	public Todo(String todo, Boolean status, String date) {
+	
+	public Todo(String todo, String date) {
 		this.todo = todo;
-		this.status = status;
 		this.date = date;
 	}
 	
