@@ -1,28 +1,29 @@
 package kr.or.connect.todo.domain;
 
+import java.sql.Timestamp;
+
 public class Todo {
 	private Integer id;
 	private String todo;
-	private Boolean status; // true == active, false == completed
-	private String date;
+	private Integer completed; // true == active, false == completed
+	private Timestamp date;
 	
 	public Todo() {
 	}
 	
-	public Todo(Boolean status) {
-		this.status = status;
+	public Todo(Integer completed) {
+		this.completed = completed;
 	}
 	
-	public Todo(String todo, Boolean status,String date) {
+	public Todo(String todo, Integer completed) {
 		this.todo = todo;
-		this.status = status;
-		this.date = date;
+		this.completed = completed;
 	}
 	
-	public Todo(Integer id, String todo, Boolean status, String date) {
+	public Todo(Integer id, String todo, Integer completed, Timestamp date) {
 		this.id = id;
 		this.todo = todo;
-		this.status = status;
+		this.completed = completed;
 		this.date = date;
 	}	
 
@@ -42,25 +43,25 @@ public class Todo {
 		this.todo = todo;
 	}
 
-	public Boolean getStatus() {
-		return status;
+	public Integer getCompleted() {
+		return completed;
 	}
 
-	public void setStatus(Boolean status) {
-		this.status = status;
+	public void setCompleted(Integer completed) {
+		this.completed = completed;
 	}
 
-	public String getDate() {
+	public Timestamp getDate() {
 		return date;
 	}
 
-	public void setDate(String date) {
+	public void setDate(Timestamp date) {
 		this.date = date;
 	}
 
 	@Override
 	public String toString() {
-		return "Todo [id=" + id + ", todo=" + todo + ", status=" + status + ", date=" + date + "]";
+		return "Todo [id=" + id + ", todo=" + todo + ", completed=" + completed + ", date=" + date + "]";
 	}	
 	
 }

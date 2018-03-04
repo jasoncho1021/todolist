@@ -15,23 +15,62 @@ $('.todo-list').on('click', '.toggle', function() {
 	//todo_count = parseInt($('.todo-count strong').text());
 	console.log(parent_ls_class);
 	if(parent_ls_class == 'completed') {
-		ChangeTodoStatus($(this).attr('value'), false);
+		ChangeTodoStatus($(this).attr('value'), 0);
 		--todo_count;
 	}
 	else {
-		ChangeTodoStatus($(this).attr('value'), true);
+		ChangeTodoStatus($(this).attr('value'), 1);
 		++todo_count
 	}
 	$('.todo-count strong').text( todo_count );
 });
 
+/*
+ * PutPost( myurl, put, data, callbackA)
+ * PutPost( myurl, post, data, callbackB)
+ * 
+ */
+
+function ChangeTodoStatus (id, status) {
+	
+	var data = { 
+			"completed": status,
+	};
+	
+	$.ajax({
+		url: myurl + "/" + id,
+		type: "PUT",
+		contentType : 'application/json',
+		data: JSON.stringify(data),
+		// jsonp: "callback",
+		success: function( response ) {
+			console.log("update success!");
+		},
+		error: function(jqXHR, exception) {
+			alert(jqXHR.status + ' ' + jqXHR.responseText);
+		}	
+	});		
+}
+ 
+/*
+ * 
+ * var DELETE = {
+ * 	delete: function() {
+ * 			ajax DELETE
+ * 		return ;
+ * 	}
+ * }
+ * 
+ * DELETE(myurl+id); // this를 넘길 수 있나??
+ * 
+ */
 // CLEAR COMPLETED
 $('.clear-completed').click(function() {
 	$('.todo-list li').each(function( index ) {
 		if( $(this).attr('class') == 'completed') {
-			var id = $(this).children('.view').children('.toggle').attr('value');
+			var id = $(this).find('.toggle').attr('value');
 			var element = this;
-			
+						
 			$.ajax({
 				url: myurl + "/" + id,
 				type: "DELETE",
@@ -70,56 +109,21 @@ $('.todo-list').on('click', '.destroy', function() {
 	})
 });
 
-function ChangeTodoStatus (id, status) {
-	
-	var data = { 
-			"status": status,
-	};
-	
-	$.ajax({
-		url: myurl + "/" + id,
-		type: "PUT",
-		contentType : 'application/json',
-		data: JSON.stringify(data),
-		// jsonp: "callback",
-		success: function( response ) {
-			console.log("update success!");
-		},
-		error: function(jqXHR, exception) {
-			alert(jqXHR.status + ' ' + jqXHR.responseText);
-		}	
-	});		
-}
-
-//CREATE
+// CREATE
 $(".new-todo").keypress(function (event) {
 	if( event.which == 13 ) {
 		event.preventDefault();
-		CreateTodo();
-	}		
-	console.log("다른 키가 눌렸니?");
+		if ( $.trim( $(this).val() ) != "" ) {
+			CreateTodo();	
+		}
+		$(this).val('');
+	}	
 });
 
 function CreateTodo () {
-	var today = new Date();
-	var dd = today.getDate();
-	var mm = today.getMonth()+1; //January is 0!
-	var yyyy = today.getFullYear();
-
-	if(dd<10) {
-	    dd='0'+dd
-	} 
-
-	if(mm<10) {
-	    mm='0'+mm
-	} 
-
-	today = mm+'/'+dd+'/'+yyyy;
-	
 	var data = { 
 			"todo": $('.new-todo').val(),
-			"status": true,
-			"date": today
+			"completed": 1,
 	};
 
 	$.ajax({
@@ -153,6 +157,24 @@ $('.filters li a').click( function() {
 	$(this).addClass('selected');
 });	
 
+/*
+ * function AllGet(e) {
+ * 		e.preventDefault();
+ * 		Get(1, get, myurl);
+ * }
+ * 
+ * function ActiveGet(e) {
+ * 		e.preventDefault();
+ * 		Get(2, get, myurl + true);
+ * }
+ * 
+ * function CompletedGet(e) {
+ * 		e.preventDefault();
+ * 		Get(3, get, myurl + false);
+ * }
+ * 
+ */
+
 // ALL GET
 function AllGet (e) {	
 		e.preventDefault();
@@ -175,7 +197,7 @@ function AllGet (e) {
 					
 					var statusText ="";
 					var checked ="";
-					if( !todo.status ) {
+					if( todo.completed == 0 ) {
 						statusText = " class=\"completed\"";
 						checked =" checked";
 						todo_count--;
@@ -205,7 +227,7 @@ function ActiveGet (e) {
 	e.preventDefault();
 			
 	$.ajax({
-		url: myurl + "/" + true,
+		url: myurl + "/" + 1,
 		type: "GET",
 		//contentType : 'application/json',
 		// jsonp: "callback",
@@ -244,7 +266,7 @@ function CompletedGet (e) {
 	e.preventDefault();
 	
 	$.ajax({
-		url: myurl + "/" + false,
+		url: myurl + "/" + 0,
 		type: "GET",
 		//contentType : 'application/json',
 		// jsonp: "callback",
